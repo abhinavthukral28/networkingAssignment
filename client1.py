@@ -3,9 +3,14 @@ import socket, sys, pickle
 #connect to server
 server = socket.socket()
 server.connect(("localhost", 1234))
+stat = ''
+path = './'
 
 #send command to a server
 server.send("ls")
+stat = server.recv(1024)
+print stat
+server.send(path)
 #get list of files
 data = server.recv(4096)
 #deserialize recieved list
