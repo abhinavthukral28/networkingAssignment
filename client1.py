@@ -1,14 +1,18 @@
-import socket, sys
+import socket, sys, pickle
 
 server = socket.socket()
 server.connect(("localhost", 1234))
-data = []
-size = int(server.recv(1024))
+data = ''
+server.send('ls')
+#size = int(server.recv(1024))
 
-while(size):
-    data = server.recv(1024)
-    print data
-    size -= 1
+#if(cmd == 'ls'):
+#for i in range(0, size/2):
+data = server.recv(4096)
+data1 = pickle.loads(data)
+print data1
+for i in range(0, len(data1)):
+    print data1[i]     
 server.close()
 
 
