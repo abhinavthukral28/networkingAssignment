@@ -1,15 +1,15 @@
 import socket, sys, pickle, os
 
 server = socket.socket()
-server.bind("localhost", 1234))
+server.bind(("localhost", 1234))
 server.listen(1)
 
 while True:
     remoteSocket, remoteAddr = server.accept()
     cmd = remoteSocket.recv(1024).decode()
     print(cmd)
-    if(cmd == "ls):
-        remoteSocket.send("Ls recieved".encode())
+    if(cmd == 'ls'):
+        remoteSocket.send("ls recieved".encode())
         path = remoteSocket.recv(1024).decode()
         dirs = os.listdir(path)
         data = pickle.dumps(dirs)
