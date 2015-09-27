@@ -9,10 +9,11 @@ print("Server Started.\n")
 while True:
     remoteSocket, remoteAddress = server.accept()
     command = remoteSocket.recv(1024).decode()
+    print(command)
     
     if(command == 'ls'):
         #Rita
-        path = remoteSocket.recv(1024).decode()
+        path = remoteSocket.recv(4096).decode()
         dirs = os.listdir(path)
         data = pickle.dumps(dirs)
         remoteSocket.send(data)
@@ -64,8 +65,12 @@ while True:
     if(command == 'cd'):
         #Abhinav
         # receive info about the requested path, if its valid send 'OK', if it isnt send 'N_OK'
-        break;
-        
+        path = remoteSocket.recv(1024).decode()
+        os.chdir(path)
+        remoteSocket.send(os.getcwd().encode())
+        print(os.getcwd())
+        command = ' '
+
     if(command == 'mkdir'):
         #Jeremy
         #check if directory exists, if it doesnt send 'OK' if not send 'N_OK'

@@ -62,7 +62,8 @@ def formatInput(rawInput):
         #To do this, check the first and last character to see if it is a /, and format accordingly
         #Also check to make sure it does not contain invalid characters, I made a function for this called checkForInvalidCharactersInDirectory
         #A side note, the highest level directory the user can see would be ./serverFiles/
-        return ' ', ' ', ' ', directory, ' '
+
+        return 'cd', ' ', ' ', directory, ' '
         
     if(rawInput[0:6] == 'mkdir ' and len(rawInput) >= 7):
         directory = rawInput[6:len(rawInput)]
@@ -117,7 +118,7 @@ while command == ' ':
     #Rita
         server.send(command.encode())
         server.send(currentDir.encode())
-        data = server.recv(4096)
+        data = server.recv(1024)
         d1 = pickle.loads(data)
         print('Files inside '+ currentDir + ' :\n')
         for i in range(0, len(d1)):
@@ -176,10 +177,13 @@ while command == ' ':
         command = ' '
         
     if(command == 'cd'):
-    #Abhinav
-    #check with the server to make sure the path is valid using .send() with text
-    #get response, if it does exist then change the currentDir variable to the full path, else print path not found
-
+        server.send(command.encode())
+        server.send(changeDir.encode())
+        d2 = server.recv(1024).decode()
+        if(d2 != currentDir):
+            currentDir = d2
+        else:
+            print("Directory does not exist")
         command = ' '
         
     if(command == 'mkdir'):
