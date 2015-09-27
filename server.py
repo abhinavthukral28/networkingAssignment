@@ -5,6 +5,8 @@ server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(("localhost",1234))
 server.listen(1)
 print("Server Started.\n")
+os.chdir("serverFiles")
+homeDir = os.getcwd();
 
 while True:
     remoteSocket, remoteAddress = server.accept()
@@ -65,9 +67,22 @@ while True:
     if(command == 'cd'):
         #Abhinav
         # receive info about the requested path, if its valid send 'OK', if it isnt send 'N_OK'
+        cdResponse = ""
         path = remoteSocket.recv(1024).decode()
-        os.chdir(path)
-        remoteSocket.send(os.getcwd().encode())
+        if(path == ".." and homeDir == os.getcwd()):
+            cdResponse = "N_OK"
+
+        elif(path == ".." and os.path.exists(path)):
+            os.chdir(path)
+            cdResponse = os.getcwd()
+
+        elif(os.path.exists(homeDir + "/" + path)):
+            os.chdir(homeDir + "/" + path)
+            cdResponse = os.getcwd()
+        else:
+            cdResponse = "N_OK"
+
+        remoteSocket.send(cdResponse.encode())
         print(os.getcwd())
         command = ' '
 

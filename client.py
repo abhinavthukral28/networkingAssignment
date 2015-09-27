@@ -96,8 +96,8 @@ def checkForInvalidCharactersInDirectory(text):
     return False
     
 #Variables
-homeDir     = './serverFiles/'           #The user can not go higher than this level
-currentDir  = './serverFiles/'           #Keep track of the current directory the user is in on the server
+homeDir     = '.'           #The user can not go higher than this level
+currentDir  = '.'           #Keep track of the current directory the user is in on the server
 rawInput    = ' '                        #Unformatted user input
 command     = ' '                        #Formatted command from the user
 fileName    = ' '                        #Formatted fileName from the user   
@@ -180,10 +180,11 @@ while command == ' ':
         server.send(command.encode())
         server.send(changeDir.encode())
         d2 = server.recv(1024).decode()
-        if(d2 != currentDir):
+        if(d2 != currentDir and d2 != "N_OK"):
             currentDir = d2
+
         else:
-            print("Directory does not exist")
+            print("Invalid Path")
         command = ' '
         
     if(command == 'mkdir'):
