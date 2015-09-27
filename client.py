@@ -68,7 +68,7 @@ def formatInput(rawInput):
     if(rawInput[0:6] == 'mkdir ' and len(rawInput) >= 7):
         directory = rawInput[6:len(rawInput)]
         #Same error checking as above for cd
-        return ' ', ' ', ' ', ' ', directory
+        return 'mkdir', ' ', ' ', ' ', directory
         
     if(rawInput[0:4] == 'quit'):
         return 'quit', ' ', ' ', ' ', ' '
@@ -189,9 +189,14 @@ while command == ' ':
         
     if(command == 'mkdir'):
     #Jeremy
-    #check with the server to make sure the path already doesn't exist
-    #if it doesn't then make it
-    #if it does print directory already exists
+        server.send(command.encode())
+        server.send(makeDir.encode())
+        d3 = server.recv(1024).decode()
+        if(d3 == "OK"):
+            print("Directory(s) created")
+        else:
+            print("Directory not Created")
+
         command = ' '
         
     if(command == 'quit'):
