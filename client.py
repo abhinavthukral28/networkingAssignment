@@ -17,14 +17,14 @@ def formatInput(rawInput):
         i = len(file) -1;
         if(checkForInvalidCharactersInFile(file)):
             #Error checking for invalid characters
-            print('File names can not contain / | * < > : ;\n')
+            print('File names can not contain / | * < > : ;\n\n')
             return ' ', ' ', ' ', ' ', ' '
             
         while(file[i] != '.'):
             #Find the position of the . and splice the file name and type
             if(i==0):
                 #If no period is found
-                print('You must specifiy a File Type\n')
+                print('You must specifiy a File Type\n\n')
                 return ' ', ' ', ' ', ' ', ' '
             i -= 1
         fileName = file[0:i]
@@ -37,14 +37,14 @@ def formatInput(rawInput):
         i = len(file) -1;
         if(checkForInvalidCharactersInFile(file)):
             #Error checking for invalid characters
-            print('File names can not contain / | * < > : ;\n')
+            print('File names can not contain / | * < > : ;\n\n')
             return ' ', ' ', ' ', ' ', ' '
             
         while(file[i] != '.'):
             #Find the position of the period and splice the file name and type
             if(i==0):
                 #If no period is found
-                print('You must specifiy a File Type\n')
+                print('You must specifiy a File Type\n\n')
                 return ' ', ' ', ' ', ' ', ' '
             i -= 1
   
@@ -53,28 +53,21 @@ def formatInput(rawInput):
         return 'put', fileName, fileType, ' ', ' '
         
     if(rawInput[0:3] == 'cd ' and len(rawInput) >= 4):
-        
+        #Cd command
         directory = rawInput[3:len(rawInput)]
-        #Error checking on directory to ensure it is a valid path
-        #Directory will be concatinated with ./serverFiles/
-        #So a valid return would be someFiles or someFiles/moreFiles/evenMore/youGetThePoint
-        #Do all error checking for these possible commands (..), (cd /someFiles/), (cd someFiles), (cd /someFiles), (cd someFiles/)
-        #To do this, check the first and last character to see if it is a /, and format accordingly
-        #Also check to make sure it does not contain invalid characters, I made a function for this called checkForInvalidCharactersInDirectory
-        #A side note, the highest level directory the user can see would be ./serverFiles/
-
         return 'cd', ' ', ' ', directory, ' '
         
     if(rawInput[0:6] == 'mkdir ' and len(rawInput) >= 7):
+        #Mkdir command
         directory = rawInput[6:len(rawInput)]
-        #Same error checking as above for cd
         return 'mkdir', ' ', ' ', ' ', directory
         
     if(rawInput[0:4] == 'quit'):
+        #Quit command
         return 'quit', ' ', ' ', ' ', ' '
         
     else:
-        print('Invalid Command\n')
+        print('Invalid Command\n\n')
         return ' ', ' ', ' ', ' ', ' '
         
 def checkForInvalidCharactersInFile(text):
@@ -96,8 +89,7 @@ def checkForInvalidCharactersInDirectory(text):
     return False
     
 #Variables
-homeDir     = '.'           #The user can not go higher than this level
-currentDir  = '.'           #Keep track of the current directory the user is in on the server
+currentDir  = ' '                          
 rawInput    = ' '                        #Unformatted user input
 command     = ' '                        #Formatted command from the user
 fileName    = ' '                        #Formatted fileName from the user   
@@ -105,25 +97,32 @@ fileType    = ' '                        #Formatted fileType from the user
 changeDir   = ' '                        #Formatted directory the user would like to try and go to
 makeDir     = ' '                        #Formatted directory the user would like to create
 
-
+print('Connecting to server...\n\n')
 while command == ' ':
+
     #Connect to the server
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.connect(("localhost",1234))
     
-    rawInput = input("Enter a command:\n")
-    command, fileName, fileType, changeDir, makeDir = formatInput(rawInput)
+    if(command == ' '):
+    #Used to get the current directory from the server
+        server.send(command.encode())
+        currentDir = server.recv(1024).decode()
+        command == ' '
+        rawInput = input(currentDir + '>')
+        command, fileName, fileType, changeDir, makeDir = formatInput(rawInput)
 
+        
     if(command == 'ls'):
     #Rita
+        print('\n    Directory: ' + currentDir + '\n')
         server.send(command.encode())
-        server.send(currentDir.encode())
-        data = server.recv(1024)
+        data = server.recv(4096)
         d1 = pickle.loads(data)
-        print('Files inside '+ currentDir + ' :\n')
         for i in range(0, len(d1)):
-            print(d1[i])
+            print('    ' + d1[i])
         command = ' '
+        print('\n')
     
     if(command == 'get'):
     #Mark
@@ -131,7 +130,6 @@ while command == ' ':
         server.send(command.encode())
         server.send(fileName.encode())
         server.send(fileType.encode())
-        server.send(currentDir.encode())
         response = server.recv(1024).decode()
         
         if( response == 'OK'):
@@ -142,15 +140,18 @@ while command == ' ':
                 newFile.write(data) 							
                 data = server.recv(1024)
             newFile.close()
-            command = ' '
             
         else:
             #If the server can't find the file
-            print("Can't find the specified file.\n")
+            print("Can't find the file on the server\n\n")
             command = ' '
-            
+            continue
+        #It worked!
+        print("File received.\n\n")
+        command = ' '
+        
     if(command == 'put'):
-    #Mark
+    #Put command
         fileExists = 'yes'
         #Check to make sure the local file exists before communicating with the server
         try:
@@ -159,13 +160,12 @@ while command == ' ':
         except IOError as e:
             fileExists = 'no'
         if(fileExists == 'no'):
-            print('Can not find the file \n')
+            print('Can not find the file in your directory\n\n')
             command = ' '
             continue
         server.send(command.encode())
         server.send(fileName.encode())
         server.send(fileType.encode())
-        server.send(currentDir.encode())
 
         file = open (fileName + '.'+fileType, "rb") 	
         data = file.read(1024) 			            
@@ -174,30 +174,34 @@ while command == ' ':
             data = file.read(1024)
         server.shutdown(socket.SHUT_WR)
         server.close()
+        print('File sent to the server\n\n')
         command = ' '
         
+        
     if(command == 'cd'):
+    #Cd command
         server.send(command.encode())
         server.send(changeDir.encode())
         d2 = server.recv(1024).decode()
-        if(d2 != currentDir and d2 != "N_OK"):
-            currentDir = d2
-
-        else:
-            print("Invalid Path")
+        if( d2 == "N_OK"):
+            print("Invalid Path\n")
+        print('\n')
         command = ' '
         
+        
     if(command == 'mkdir'):
-    #Jeremy
+    #Mkdir command
         server.send(command.encode())
         server.send(makeDir.encode())
         d3 = server.recv(1024).decode()
         if(d3 == "OK"):
-            print("Directory(s) created")
+            print("Directory(s) created\n\n")
         else:
-            print("Directory not Created")
+            print("Directory not created\n\n")
 
         command = ' '
         
     if(command == 'quit'):
+        server.send(command.encode())
+        print('Goodbye!\n\n')
         break

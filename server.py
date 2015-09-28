@@ -1,72 +1,76 @@
 import socket, sys, pickle, os
 
-# Setup the server to listen
+#Setup the server to listen
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(("localhost", 1234))
+server.bind(("localhost",1234))
 server.listen(1)
+os.chdir('serverFiles')
 print("Server Started.\n")
-os.chdir("serverFiles")
-homeDir = os.getcwd();
+
+#Variables
+homeDir = os.getcwd()
+userVisibleDir = ''
 
 while True:
     remoteSocket, remoteAddress = server.accept()
     command = remoteSocket.recv(1024).decode()
-    print(command)
-
-    if (command == 'ls'):
-        # Rita
-        path = remoteSocket.recv(4096).decode()
-        dirs = os.listdir(path)
+    
+    if(command == ' '):
+        #Send currentDir to user for prompt
+        remoteSocket.send(os.getcwd().encode())
+        command = remoteSocket.recv(1024).decode()
+        
+    if(command == 'ls'):
+        #Ls
+        dirs = os.listdir(os.getcwd())
         data = pickle.dumps(dirs)
         remoteSocket.send(data)
-
-    if (command == 'get'):
-        # Mark
+        
+            
+    if(command == 'get'):
+        #Get
         fileName = remoteSocket.recv(1024).decode()
         fileType = remoteSocket.recv(1024).decode()
-        fileLocation = remoteSocket.recv(1024).decode()
         fileExists = 'yes'
-        # Find out if the file exists
+        #Find out if the file exists
         try:
-            with open(fileLocation + fileName + '.' + fileType) as file:
+            with open(fileName + '.' + fileType) as file:
                 pass
         except IOError as e:
             fileExists = 'no'
-
-        if (fileExists == 'yes'):
-            # if file is found
+        
+        if(fileExists == 'yes'):
+            #if file is found
             remoteSocket.send('OK'.encode())
-            file = open(fileLocation + fileName + '.' + fileType, "rb")
-            data = file.read(1024)
-            while (data):
-                remoteSocket.send(data)
+            file = open (fileName + '.'+fileType, "rb") 	
+            data = file.read(1024) 			            
+            while (data):					
+                remoteSocket.send(data)			
                 data = file.read(1024)
             remoteSocket.shutdown(socket.SHUT_WR)
             remoteSocket.close()
-            command = ' '
+            print('Sent ' + fileName + '.' + fileType +' from ' + os.getcwd() + '\n')
         else:
             remoteSocket.send('N_OK'.encode())
-            command = ' '
-
-    if (command == 'put'):
-        # Rita
+            
+            
+    if(command == 'put'):
+        #Rita
         fileName = remoteSocket.recv(1024).decode()
         fileType = remoteSocket.recv(1024).decode()
-        fileLocation = remoteSocket.recv(1024).decode()
-
-        newFile = open(fileLocation + fileName + '.' + fileType, 'wb')
-        data = remoteSocket.recv(1024)
-        while (data):
-            newFile.write(data)
+        newFile = open(fileName + '.'+ fileType,'wb') 				
+        data = remoteSocket.recv(1024) 						
+        while (data): 										
+            newFile.write(data) 							
             data = remoteSocket.recv(1024)
         newFile.close()
-        command = ' '
-
-    if (command == 'cd'):
-        # Abhinav
-        # receive info about the requested path, if its valid send 'OK', if it isnt send 'N_OK'
+        print('Received ' + fileName + '.' + fileType + '\n')
+       
+    if(command == 'cd'):
+    #cd command
         cdResponse = ""
         path = remoteSocket.recv(1024).decode()
+        
         if (path == ".." and homeDir == os.getcwd()):
             cdResponse = "N_OK"
 
@@ -74,29 +78,33 @@ while True:
             os.chdir(path)
             cdResponse = os.getcwd()
 
-        elif (os.path.exists(homeDir + "/" + path)):
-            os.chdir(homeDir + "/" + path)
+        elif (os.path.exists(os.getcwd() + "/" + path)):
+            os.chdir(os.getcwd() + "/" + path)
             cdResponse = os.getcwd()
         else:
             cdResponse = "N_OK"
 
         remoteSocket.send(cdResponse.encode())
-        print(os.getcwd())
-        command = ' '
 
-    if (command == 'mkdir'):
-        # Jeremy
+        
+    if(command == 'mkdir'):
+        #mkdir command
         path = remoteSocket.recv(1024).decode()
         try:
-            os.makedirs(homeDir + "/" + path)
+            os.makedirs(os.getcwd() + "/" + path)
             remoteSocket.send("OK".encode())
 
 
         except OSError:
-            if not os.path.isdir(homeDir + "/" + path):
+            if not os.path.isdir(os.getcwd() + "/" + path):
                 remoteSocket.send("OK".encode())
 
             else:
                 remoteSocket.send("N_OK".encode())
                 # Error occured
-    command = ' '
+
+    if(command == 'quit'):
+        remoteSocket.close()
+        os.chdir(homeDir)
+    
+
