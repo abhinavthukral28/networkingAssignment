@@ -29,12 +29,14 @@ while True:
             
     if(command == 'get'):
         #Get
+        print(os.getcwd())
         fileName = remoteSocket.recv(1024).decode()
-        fileType = remoteSocket.recv(1024).decode()
+        print(fileName)
+        # fileType = remoteSocket.recv(1024).decode()
         fileExists = 'yes'
         #Find out if the file exists
         try:
-            with open(fileName + '.' + fileType) as file:
+            with open(fileName) as file:
                 pass
         except IOError as e:
             fileExists = 'no'
@@ -42,14 +44,14 @@ while True:
         if(fileExists == 'yes'):
             #if file is found
             remoteSocket.send('OK'.encode())
-            file = open (fileName + '.'+fileType, "rb") 	
+            file = open (fileName, "rb")
             data = file.read(1024) 			            
             while (data):					
                 remoteSocket.send(data)			
                 data = file.read(1024)
             remoteSocket.shutdown(socket.SHUT_WR)
             remoteSocket.close()
-            print('Sent ' + fileName + '.' + fileType +' from ' + os.getcwd() + '\n')
+            print('Sent ' + fileName +' from ' + os.getcwd() + '\n')
         else:
             remoteSocket.send('N_OK'.encode())
             

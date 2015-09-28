@@ -128,8 +128,9 @@ while command == ' ':
     #Mark
         #Send the command, fileName, fileType, and fileLocation to the server
         server.send(command.encode())
-        server.send(fileName.encode())
-        server.send(fileType.encode())
+        server.send((fileName + "." + fileType).encode())
+        # server.send(fileType.encode())
+        print(fileName,fileType)
         response = server.recv(1024).decode()
         
         if( response == 'OK'):
