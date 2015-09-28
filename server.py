@@ -14,7 +14,6 @@ print("Server port:    " + str(port))
 
 #Variables
 homeDir = os.getcwd()
-userVisibleDir = ''
 
 while True:
     remoteSocket, remoteAddress = server.accept()

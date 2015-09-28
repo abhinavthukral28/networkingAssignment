@@ -88,8 +88,7 @@ def checkForInvalidCharactersInDirectory(text):
         i -= 1
     return False
     
-#Variables
-currentDir  = ' '                          
+#Variables                          
 rawInput    = ' '                        #Unformatted user input
 command     = ' '                        #Formatted command from the user
 fileName    = ' '                        #Formatted fileName from the user   
