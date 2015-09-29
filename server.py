@@ -1,11 +1,16 @@
 import socket, sys, pickle, os
 
+addr = socket.gethostbyname(socket.gethostname())
+port = 8080
+
 #Setup the server to listen
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-server.bind(("localhost",1234))
+server.bind((addr,8080))
 server.listen(1)
 os.chdir('serverFiles')
 print("Server Started.\n")
+print("Server address: " + addr)
+print("Server port:    " + str(port))
 
 #Variables
 homeDir = os.getcwd()
