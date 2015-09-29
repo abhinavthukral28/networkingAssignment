@@ -97,12 +97,18 @@ fileType    = ' '                        #Formatted fileType from the user
 changeDir   = ' '                        #Formatted directory the user would like to try and go to
 makeDir     = ' '                        #Formatted directory the user would like to create
 
+addr = ''
+port = ''
+
+addr = input("Please, enter server address:\n");
+port = input("Please, enter server port: \n");
+
 print('Connecting to server...\n\n')
 while command == ' ':
 
     #Connect to the server
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.connect(("localhost",1234))
+    server.connect((addr,int(port)))
     
     if(command == ' '):
     #Used to get the current directory from the server
