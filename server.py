@@ -62,8 +62,11 @@ while True:
             
     if(command == 'put'):
         #Rita
+        remoteSocket.send("recieved".encode())
         fileName = remoteSocket.recv(1024).decode()
+        remoteSocket.send("recieved".encode())
         fileType = remoteSocket.recv(1024).decode()
+        remoteSocket.send("recieved".encode())
         newFile = open(fileName + '.'+ fileType,'wb') 				
         data = remoteSocket.recv(1024) 						
         while (data): 										
