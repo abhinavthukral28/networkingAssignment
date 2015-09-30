@@ -158,6 +158,7 @@ while command == ' ':
         
     if(command == 'put'):
     #Put command
+        stat = ''
         fileExists = 'yes'
         #Check to make sure the local file exists before communicating with the server
         try:
@@ -170,8 +171,11 @@ while command == ' ':
             command = ' '
             continue
         server.send(command.encode())
+        stat = server.recv(1024).decode()
         server.send(fileName.encode())
+        stat = server.recv(1024).decode()
         server.send(fileType.encode())
+        stat = server.recv(1024).decode()
 
         file = open (fileName + '.'+fileType, "rb") 	
         data = file.read(1024) 			            
