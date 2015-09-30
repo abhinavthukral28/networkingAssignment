@@ -26,6 +26,7 @@ while True:
         
     if(command == 'ls'):
         #Ls
+        print("ls command recieved.")
         dirs = os.listdir(os.getcwd())
         data = pickle.dumps(dirs)
         remoteSocket.send(data)
@@ -33,6 +34,7 @@ while True:
             
     if(command == 'get'):
         #Get
+        print("get command recieved.")
         print(os.getcwd())
         fileName = remoteSocket.recv(1024).decode()
         print(fileName)
@@ -62,6 +64,7 @@ while True:
             
     if(command == 'put'):
         #Rita
+        print("put command recieved.")
         remoteSocket.send("recieved".encode())
         fileName = remoteSocket.recv(1024).decode()
         remoteSocket.send("recieved".encode())
@@ -77,6 +80,7 @@ while True:
        
     if(command == 'cd'):
     #cd command
+        print("cd command recieved.")
         cdResponse = ""
         path = remoteSocket.recv(1024).decode()
         
@@ -98,6 +102,7 @@ while True:
         
     if(command == 'mkdir'):
         #mkdir command
+        print("mkdir command recieved.")
         path = remoteSocket.recv(1024).decode()
         try:
             os.makedirs(os.getcwd() + "/" + path)
