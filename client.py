@@ -27,11 +27,11 @@ def formatInput(rawInput): # takes raw input from user
                 print('You must specifiy a File Type\n\n')
                 return ' ', ' ', ' ', ' ', ' '
             i -= 1 # counts down in the iterator
-        fileName = file[0:i] # retrieve the name of file without the splice
-        fileType = file[i+1:len(file)] # retrieve the type of file after the splice
-        return 'get', fileName, fileType, ' ', ' ' # retrieves full path of file
+        fileName = file[0:i] # retrieve the name of file
+        fileType = file[i+1:len(file)] # retrieve the type of file
+        return 'get', fileName, fileType, ' ', ' ' # retrieve full path of file
     
-    if(rawInput[0:4] == 'put ' and len(rawInput) >= 7): # user selects the put command
+    if(rawInput[0:4] == 'put ' and len(rawInput) >= 7): # if user selects the put command
         #Put a file command
         file = rawInput[4:len(rawInput)] # file becomes the user input
         i = len(file) -1; # iterator
