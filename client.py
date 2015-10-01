@@ -85,7 +85,7 @@ def checkForInvalidCharactersInDirectory(text):
     while(i >= 0):
         if(text[i] == '*' or text[i] == ';' or text[i] == ':' or text[i] == '>' or text[i] == '<' or text[i] == '|'): # looks for special charactes in directory
             return True
-        i -= 1 # iterates through lenght of directory name
+        i -= 1 # iterates through length of directory name
     return False
     
 #Variables                          
