@@ -88,6 +88,29 @@ def checkForInvalidCharactersInDirectory(text):
         i -= 1 # iterates through length of directory name
     return False
     
+#Function takes address and port number from user required for connection
+def getAddrAndPort():
+    addr = ''
+    port = ''
+    while(True):
+        addr = input("Please, enter server address(IP address only):\n")
+        port = input("Please, enter server port: \n")
+        try:
+            socket.inet_aton(addr)
+        except socket.error:
+            print("Invalid address.")
+            continue
+        if(len(port) != 4):
+            print("Invalid port number.")
+            continue
+        try:
+            port = int(port)
+        except ValueError:
+            print("Given port is not a number.")
+            continue
+        break
+    return addr, port
+    
 #Variables                          
 rawInput    = ' '                        #Unformatted user input
 command     = ' '                        #Formatted command from the user
@@ -96,18 +119,19 @@ fileType    = ' '                        #Formatted fileType from the user
 changeDir   = ' '                        #Formatted directory the user would like to try and go to
 makeDir     = ' '                        #Formatted directory the user would like to create
 
-addr = ''
-port = ''
-
-addr = input("Please, enter server address:\n");
-port = input("Please, enter server port: \n");
+addr, port = getAddrAndPort()
 
 print('Connecting to server...\n\n')
 while command == ' ':
 
     #Connect to the server
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server.connect((addr,int(port)))
+    try:
+        server.connect((addr,int(port)))
+    except socket.error:
+        print("Something went wrong:c")
+        addr, port = getAddrAndPort()
+        continue
     
     if(command == ' '):
     #Used to get the current directory from the server
